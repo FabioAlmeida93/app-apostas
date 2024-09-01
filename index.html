@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App de Apostas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>App de Apostas amigável</h1>
+    <div id="create-bet">
+        <h2>Criar Aposta</h2>
+        <input type="text" id="bet-title" placeholder="Descrição da Aposta">
+        <input type="text" id="bet-options" placeholder="Opções (separadas por vírgula)">
+        <input type="text" id="bet-penalty" placeholder="Penalidade para perdedores">
+        <button onclick="createBet()">Criar Aposta</button>
+    </div>
+
+    <div id="bet-list">
+        <h2>Apostas Ativas</h2>
+        <!-- As apostas serão listadas aqui -->
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
