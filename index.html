@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Apostas amigáveisfire</title>
+    <title>Apostas amigáveis</title>
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -13,7 +13,7 @@
             <input type="text" id="bet-title" placeholder="Título da aposta" /><br /><br />
             <input type="text" id="bet-options" placeholder="Opções (separadas por vírgula)" /><br /><br />
             <input type="text" id="bet-penalty" placeholder="Penalidade para os perdedores" /><br /><br />
-            <button onclick="createBet()">Criar Aposta</button>
+            <button id="createBetButton">Criar Aposta</button>
         </div>
         <div id="bet-list"></div>
     </div>
@@ -21,7 +21,8 @@
     <!-- Firebase JS SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
-    <!-- Seu arquivo JavaScript -->
-    <script src="script.js"></script>
+
+    <!-- Inclui o arquivo JavaScript como módulo -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
