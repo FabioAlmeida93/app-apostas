@@ -32,6 +32,8 @@ button {
     border-radius: 4px;
     cursor: pointer;
     background-color: #5b9fed;
+    color: #ffffff;
+    font-weight: 500;
 }
 
 button:hover {
