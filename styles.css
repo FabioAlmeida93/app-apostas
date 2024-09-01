@@ -4,33 +4,44 @@ body {
     background-color: #f4f4f4;
 }
 
-#create-bet, #bet-list {
-    margin-bottom: 20px;
-    padding: 10px;
-    background-color: white;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.container {
+    max-width: 600px;
+    margin: auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
-input {
-    display: block;
-    width: 90%;
-    padding: 10px;
-    margin-bottom: 10px;
+.bet {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
     border-radius: 5px;
-    border: 1px solid #ccc;
+    background-color: #fafafa;
+}
+
+.bet h3 {
+    margin-top: 0;
 }
 
 button {
-    padding: 10px 20px;
-    margin: 5px 0;
-    background-color: #007bff;
-    color: white;
+    padding: 10px 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #0056b3;
+    opacity: 0.9;
+}
+
+button[onclick^="vote"] {
+    background-color: #28a745;
+    color: white;
+}
+
+button[onclick^="deleteBet"] {
+    background-color: #dc3545;
+    color: white;
 }

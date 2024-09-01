@@ -1,101 +1,121 @@
-// Array para armazenar as apostas
-const bets = [];
+// Importações do Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// Função para salvar as apostas no localStorage
-function saveBets() {
-    localStorage.setItem('bets', JSON.stringify(bets));
-}
+// Configurações do Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyDN9467SDNNgmLsS-p-HaF0jNzyme9eKj4",
+    authDomain: "app-apostas-72373.firebaseapp.com",
+    projectId: "app-apostas-72373",
+    storageBucket: "app-apostas-72373.appspot.com",
+    messagingSenderId: "13035075006",
+    appId: "1:13035075006:web:495552d13486b957e7b5ef"
+};
 
-// Função para carregar as apostas do localStorage
-function loadBets() {
-    const savedBets = localStorage.getItem('bets');
-    if (savedBets) {
-        // Carregar as apostas salvas no array bets
-        bets.push(...JSON.parse(savedBets));
-        displayBets();
-    }
-}
+// Inicializa o Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 // Função para criar uma nova aposta
-function createBet() {
+async function createBet() {
     const title = document.getElementById('bet-title').value;
     const options = document.getElementById('bet-options').value.split(',');
     const penalty = document.getElementById('bet-penalty').value;
 
     if (title && options.length && penalty) {
-        const bet = {
-            title,
-            options: options.map(option => option.trim()),
-            penalty,
-            votes: {}
-        };
-        bets.push(bet);
-        saveBets();  // Salvar a nova aposta no localStorage
-        displayBets();  // Atualizar a exibição das apostas
-        // Limpar os campos de input
-        document.getElementById('bet-title').value = '';
-        document.getElementById('bet-options').value = '';
-        document.getElementById('bet-penalty').value = '';
+        try {
+            await addDoc(collection(db, 'bets'), {
+                title,
+                options: options.map(option => option.trim()),
+                penalty,
+                votes: {}
+            });
+            alert('Aposta criada com sucesso!');
+            // Limpar os campos de input
+            document.getElementById('bet-title').value = '';
+            document.getElementById('bet-options').value = '';
+            document.getElementById('bet-penalty').value = '';
+        } catch (error) {
+            console.error("Erro ao criar a aposta: ", error);
+        }
     } else {
         alert('Preencha todos os campos.');
     }
 }
 
-// Função para exibir as apostas na página
+// Função para exibir as apostas
 function displayBets() {
     const betList = document.getElementById('bet-list');
-    betList.innerHTML = '<h2>Apostas Ativas</h2>';
-    
-    bets.forEach((bet, index) => {
-        const betDiv = document.createElement('div');
-        betDiv.className = 'bet';
+    const betsRef = collection(db, 'bets');
 
-        const optionsHtml = bet.options.map(option => `
-            <button onclick="vote(${index}, '${option}')">${option}</button>
-        `).join(' ');
+    onSnapshot(betsRef, (snapshot) => {
+        betList.innerHTML = '<h2>Apostas Ativas</h2>';
+        snapshot.forEach((docSnap) => {
+            const bet = docSnap.data();
+            const betDiv = document.createElement('div');
+            betDiv.className = 'bet';
 
-        // Adicionando a lista de votantes
-        const votesHtml = Object.entries(bet.votes).map(([user, vote]) => `
-            <p>${user} votou em: <strong>${vote}</strong></p>
-        `).join('');
+            const optionsHtml = bet.options.map(option => `
+                <button onclick="vote('${docSnap.id}', '${option}')">${option}</button>
+            `).join(' ');
 
-        // Adicionando o botão para apagar a aposta
-        const deleteButton = `<button onclick="deleteBet(${index})" style="margin-top: 10px; color: white; background-color: red;">Apagar Aposta</button>`;
+            const votesHtml = Object.entries(bet.votes).map(([user, vote]) => `
+                <p>${user} votou em: <strong>${vote}</strong></p>
+            `).join('');
 
-        betDiv.innerHTML = `
-            <h3>${bet.title}</h3>
-            <p>Penalidade: ${bet.penalty}</p>
-            <div>${optionsHtml}</div>
-            <div>
-                <h4>Votos:</h4>
-                ${votesHtml}
-            </div>
-            ${deleteButton}  <!-- Exibe o botão de apagar -->
-        `;
-        betList.appendChild(betDiv);
+            const deleteButton = `<button onclick="deleteBet('${docSnap.id}')" style="margin-top: 10px; color: white; background-color: red;">Apagar Aposta</button>`;
+
+            betDiv.innerHTML = `
+                <h3>${bet.title}</h3>
+                <p>Penalidade: ${bet.penalty}</p>
+                <div>${optionsHtml}</div>
+                <div>
+                    <h4>Votos:</h4>
+                    ${votesHtml || '<p>Nenhum voto ainda.</p>'}
+                </div>
+                ${deleteButton}
+            `;
+            betList.appendChild(betDiv);
+        });
     });
 }
 
-// Função para registrar o voto de um usuário
-function vote(betIndex, option) {
+// Função para votar em uma opção
+async function vote(betId, option) {
     const user = prompt('Digite seu nome:');
     if (user) {
-        bets[betIndex].votes[user] = option;
-        saveBets();  // Salvar os votos no localStorage
-        displayBets();  // Atualizar a exibição das apostas com os votos
-        alert(`${user}, você votou em: ${option}`);
+        const betDoc = doc(db, 'bets', betId);
+        const betSnap = await betDoc.get();
+
+        if (betSnap.exists()) {
+            const betData = betSnap.data();
+            betData.votes[user] = option;
+            try {
+                await updateDoc(betDoc, { votes: betData.votes });
+                alert(`${user}, você votou em: ${option}`);
+            } catch (error) {
+                console.error("Erro ao registrar o voto: ", error);
+            }
+        } else {
+            console.error("Aposta não encontrada!");
+        }
     }
 }
 
-// Função para apagar uma aposta
-function deleteBet(index) {
+// Função para deletar uma aposta
+async function deleteBet(betId) {
     const confirmation = confirm("Tem certeza que deseja apagar esta aposta?");
     if (confirmation) {
-        bets.splice(index, 1);  // Remove a aposta do array
-        saveBets();  // Atualiza o localStorage
-        displayBets();  // Atualiza a exibição
+        try {
+            await deleteDoc(doc(db, 'bets', betId));
+            alert("Aposta apagada com sucesso!");
+        } catch (error) {
+            console.error("Erro ao apagar a aposta: ", error);
+        }
     }
 }
 
-// Carregar as apostas ao iniciar a aplicação
-document.addEventListener('DOMContentLoaded', loadBets);
+// Iniciar a exibição das apostas ao carregar a página
+window.onload = () => {
+    displayBets();
+};
