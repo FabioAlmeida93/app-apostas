@@ -19,10 +19,28 @@
     </div>
 
     <!-- Firebase JS SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+      
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDN9467SDNNgmLsS-p-HaF0jNzyme9eKj4",
+            authDomain: "app-apostas-72373.firebaseapp.com",
+            projectId: "app-apostas-72373",
+            storageBucket: "app-apostas-72373.appspot.com",
+            messagingSenderId: "13035075006",
+            appId: "1:13035075006:web:495552d13486b957e7b5ef"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-    <!-- Seu arquivo JavaScript -->
-    <script src="script.js"></script>
+        // Expõe `db` ao escopo global para ser usado no script.js
+        window.db = db;
+    </script>
+    <script src="script.js" type="module"></script>
 </body>
 </html>

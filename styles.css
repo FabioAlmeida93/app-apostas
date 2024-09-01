@@ -27,13 +27,20 @@ body {
 
 button {
     padding: 10px 15px;
+    margin: 5px 0;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    background-color: #5b9fed;
 }
 
 button:hover {
     opacity: 0.9;
+}
+
+#createBetButton {
+    background-color: #28a745;
+    color: white;
 }
 
 button[onclick^="vote"] {
@@ -41,7 +48,7 @@ button[onclick^="vote"] {
     color: white;
 }
 
-button[onclick^="deleteBet"] {
+button[onclick^="clearBet"] {
     background-color: #dc3545;
     color: white;
 }
