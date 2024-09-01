@@ -23,8 +23,8 @@ const betPenaltyInput = document.getElementById('bet-penalty');
 const createBetButton = document.getElementById('createBetButton');
 const betList = document.getElementById('bet-list');
 
-// Função para criar uma nova aposta
-async function createBet() {
+// Define as funções no escopo global
+window.createBet = async function() {
   const betTitle = betTitleInput.value.trim();
   const betOptions = betOptionsInput.value.trim();
   const betPenalty = betPenaltyInput.value.trim();
@@ -44,8 +44,7 @@ async function createBet() {
   }
 }
 
-// Função para exibir todas as apostas
-async function displayBets() {
+window.displayBets = async function() {
   const querySnapshot = await getDocs(collection(db, 'bets'));
   betList.innerHTML = '';
   querySnapshot.forEach((doc) => {
@@ -62,8 +61,7 @@ async function displayBets() {
   });
 }
 
-// Função para apagar uma aposta específica
-async function clearBet(id) {
+window.clearBet = async function(id) {
   await deleteDoc(doc(db, 'bets', id));
   displayBets();
 }
