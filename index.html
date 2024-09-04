@@ -3,44 +3,27 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Apostas amigáveis</title>
+    <title>Distribuição de Jogadores</title>
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>Criar Nova Aposta</h1>
-        <div>
-            <input type="text" id="bet-title" placeholder="Título da aposta" /><br /><br />
-            <input type="text" id="bet-options" placeholder="Opções (separadas por vírgula)" /><br /><br />
-            <input type="text" id="bet-penalty" placeholder="Penalidade para os perdedores" /><br /><br />
-            <button id="createBetButton">Criar Aposta</button>
-        </div>
-        <div id="bet-list"></div>
-    </div>
+    <h1>Distribuição de Jogadores</h1>
+    
+    <label for="num-teams">Número de Equipas:</label>
+    <input type="number" id="num-teams" min="2" placeholder="Insira o número de equipas">
 
-    <!-- Firebase JS SDK -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-      
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDN9467SDNNgmLsS-p-HaF0jNzyme9eKj4",
-            authDomain: "app-apostas-72373.firebaseapp.com",
-            projectId: "app-apostas-72373",
-            storageBucket: "app-apostas-72373.appspot.com",
-            messagingSenderId: "13035075006",
-            appId: "1:13035075006:web:495552d13486b957e7b5ef"
-        };
-      
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    <button id="confirmTeamsButton">Confirmar Equipas</button>
 
-        // Expõe `db` ao escopo global para ser usado no script.js
-        window.db = db;
-    </script>
-    <script src="script.js" type="module"></script>
+    <label for="player-name">Nome do Jogador:</label>
+    <input type="text" id="player-name" placeholder="Escreve o teu nome">
+
+    <section class="flex">
+        <button id="distributeButton" disabled>Distribuir</button>
+        <button id="resetButton">Reset</button>
+    </section>
+
+    <div id="teams-list"></div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
