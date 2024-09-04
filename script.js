@@ -116,7 +116,7 @@ async function distributePlayers() {
 
         // Distribuir jogadores uniformemente
         // Calcular a quantidade média de jogadores por equipe
-        const avgPlayers = Math.floor(players.length / numTeams);
+        const avgPlayers = Math.floor(players.length / settings.numTeams);
         // Filtrar equipes que estão abaixo da média
         availableTeams = availableTeams.filter(team => team.players.length < avgPlayers + 1);
 
