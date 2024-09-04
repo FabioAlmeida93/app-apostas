@@ -197,7 +197,8 @@ async function loadGameData() {
         const settingsDoc = await getDoc(doc(db, 'gameSettings', 'settings'));
         const settings = settingsDoc.data();
         if (!settings || !settings.numTeams) {
-            return; // Nenhum jogo configurado
+            // Nenhum jogo configurado
+            return;
         }
 
         numTeams = settings.numTeams;
@@ -240,10 +241,11 @@ async function loadGameData() {
         });
 
         // Atualizar o estado dos botões
-        numTeamsInput.disabled = settings.creatorID !== creatorID;
-        confirmTeamsButton.disabled = settings.creatorID !== creatorID;
-        distributeButton.disabled = settings.numTeams === undefined;
-        resetButton.disabled = settings.creatorID !== creatorID;
+        const isCreator = settings.creatorID === creatorID;
+        numTeamsInput.disabled = !isCreator;
+        confirmTeamsButton.disabled = !isCreator;
+        distributeButton.disabled = !settings.numTeams || !isCreator;
+        resetButton.disabled = !isCreator;
 
     } catch (error) {
         console.error("Erro ao carregar dados do jogo: ", error);
