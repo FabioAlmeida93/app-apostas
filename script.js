@@ -242,8 +242,8 @@ async function loadGameData() {
 
         // Atualizar o estado dos botões
         const isCreator = settings.creatorID === creatorID;
-        numTeamsInput.disabled = !isCreator;
-        confirmTeamsButton.disabled = !isCreator;
+        numTeamsInput.disabled = isCreator ? true : false;
+        confirmTeamsButton.disabled = isCreator ? true : false;
         distributeButton.disabled = !settings.numTeams || !isCreator;
         resetButton.disabled = !isCreator;
 
