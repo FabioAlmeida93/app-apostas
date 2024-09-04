@@ -1,6 +1,6 @@
 // Importar funções necessárias do Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -40,7 +40,7 @@ async function confirmTeams() {
     numTeamsInput.disabled = true;
     confirmTeamsButton.disabled = true;
 
-    // Habilitar o botão de distribuição de jogadores
+    // Habilitar o botão de distribuição de jogadores e reset
     distributeButton.disabled = false;
     resetButton.disabled = false;
 
@@ -64,6 +64,9 @@ async function confirmTeams() {
         numTeams: numTeams,
         creatorID: creatorID
     });
+
+    // Carregar dados atuais
+    loadGameData();
 }
 
 // Função para distribuir os jogadores entre as equipes
@@ -103,15 +106,25 @@ async function distributePlayers() {
             }
         });
 
-        // Verificar se há espaço em alguma equipe
-        const availableTeams = teams.filter(team => team.players.length < 5);
+        // Adicionar o novo jogador à equipe com menos jogadores
+        let availableTeams = teams.filter(team => team.players.length < 5);
+
         if (availableTeams.length === 0) {
             alert('Todas as equipas estão cheias.');
             return;
         }
 
-        // Atribuir o jogador a uma equipe aleatória com espaço disponível
-        const selectedTeam = availableTeams[Math.floor(Math.random() * availableTeams.length)];
+        // Distribuir jogadores uniformemente
+        // Calcular a quantidade média de jogadores por equipe
+        const avgPlayers = Math.floor(players.length / numTeams);
+        // Filtrar equipes que estão abaixo da média
+        availableTeams = availableTeams.filter(team => team.players.length < avgPlayers + 1);
+
+        // Se todas as equipes estão equilibradas, apenas escolher aleatoriamente
+        const selectedTeam = availableTeams.length > 0 
+            ? availableTeams[Math.floor(Math.random() * availableTeams.length)]
+            : teams[Math.floor(Math.random() * teams.length)];
+
         selectedTeam.players.push(playerName);
 
         // Registrar o jogador e sua equipe no Firestore
@@ -177,7 +190,70 @@ async function resetTeams() {
     }
 }
 
+// Função para carregar dados do jogo e atualizar a interface
+async function loadGameData() {
+    try {
+        // Obter as configurações do jogo
+        const settingsDoc = await getDoc(doc(db, 'gameSettings', 'settings'));
+        const settings = settingsDoc.data();
+        if (!settings || !settings.numTeams) {
+            return; // Nenhum jogo configurado
+        }
+
+        numTeams = settings.numTeams;
+        creatorID = settings.creatorID;
+
+        // Criar a estrutura das equipes na interface
+        teamsList.innerHTML = '';
+        for (let i = 1; i <= numTeams; i++) {
+            const teamDiv = document.createElement('div');
+            teamDiv.innerHTML = `
+                <h3>Equipa ${i}</h3>
+                <p>Jogadores: Nenhum jogador ainda.</p>
+                <hr />
+            `;
+            teamsList.appendChild(teamDiv);
+        }
+
+        // Carregar a lista de jogadores
+        const playersSnapshot = await getDocs(collection(db, 'players'));
+        const players = playersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Preencher as equipes com jogadores existentes
+        let teams = Array.from({ length: numTeams }, (_, i) => ({ id: i + 1, players: [] }));
+        players.forEach(player => {
+            if (player.teamId !== undefined) {
+                teams[player.teamId - 1].players.push(player.name);
+            }
+        });
+
+        // Exibir as equipes com os jogadores, mantendo a ordem das equipes
+        teamsList.innerHTML = '';
+        teams.forEach(team => {
+            const teamDiv = document.createElement('div');
+            teamDiv.innerHTML = `
+                <h3>Equipa ${team.id}</h3>
+                <p>Jogadores: ${team.players.join(', ') || 'Nenhum jogador ainda.'}</p>
+                <hr />
+            `;
+            teamsList.appendChild(teamDiv);
+        });
+
+        // Atualizar o estado dos botões
+        numTeamsInput.disabled = settings.creatorID !== creatorID;
+        confirmTeamsButton.disabled = settings.creatorID !== creatorID;
+        distributeButton.disabled = settings.numTeams === undefined;
+        resetButton.disabled = settings.creatorID !== creatorID;
+
+    } catch (error) {
+        console.error("Erro ao carregar dados do jogo: ", error);
+    }
+}
+
 // Adicionar os event listeners aos botões
 confirmTeamsButton.addEventListener('click', confirmTeams);
 distributeButton.addEventListener('click', distributePlayers);
 resetButton.addEventListener('click', resetTeams);
+
+// Carregar dados ao iniciar a aplicação
+window.addEventListener('load', loadGameData);
